@@ -139,7 +139,8 @@ def locate_weld_roi(
     work_bottom_y = by + bh - 1
     y = _clamp(work_bottom_y - bottom_margin - height + 1, 0, gray.shape[0] - height)
     width = min(width, gray.shape[1] - x)
-    height = min(height, gray.shape[0] - y)
+    base_height = min(height, gray.shape[0] - y)
+    height = min(int(round(base_height * 1.10)), gray.shape[0] - y)
     work_quad_aligned = np.array(
         [
             [bx, by],
@@ -229,7 +230,6 @@ def locate_terminal_contour(gray: np.ndarray, dark_threshold: int = 100):
 
 def draw_roi(gray: np.ndarray, roi: Roi) -> np.ndarray:
     canvas = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-    cv2.polylines(canvas, [np.round(roi.lower_half_quad).astype(np.int32)], True, (0, 255, 0), 3)
     cv2.polylines(canvas, [np.round(roi.work_quad).astype(np.int32)], True, (255, 255, 0), 3)
     cv2.polylines(canvas, [np.round(roi.roi_quad).astype(np.int32)], True, (0, 0, 255), 4)
     geometry_line = np.round(roi.geometry_line_quad).astype(np.int32)

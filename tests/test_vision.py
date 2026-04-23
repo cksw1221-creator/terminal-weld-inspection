@@ -12,7 +12,7 @@ import cv2
 
 from weld_cv.inspect import classify_features, extract_features
 from weld_cv.image_io import read_gray
-from weld_cv.roi import _deskew_delta, crop_roi, locate_weld_roi
+from weld_cv.roi import _deskew_delta, crop_roi, draw_roi, locate_weld_roi
 
 
 class VisionTests(unittest.TestCase):
@@ -25,7 +25,7 @@ class VisionTests(unittest.TestCase):
 
         self.assertLessEqual(abs(roi.center_x - 100), 8)
         self.assertEqual(roi.width, 50)
-        self.assertEqual(roi.height, 120)
+        self.assertEqual(roi.height, 132)
         self.assertGreaterEqual(roi.x, 0)
         self.assertGreaterEqual(roi.y, 0)
 
@@ -115,7 +115,7 @@ class VisionTests(unittest.TestCase):
             bottom_margin=0,
         )
 
-        self.assertLessEqual(abs((roi.y + roi.height - 1) - 234), 8)
+        self.assertLessEqual(abs((roi.y + roi.height - 1) - 246), 2)
 
     def test_rotation_uses_lower_half_not_upper_round_head(self):
         image = np.full((320, 320), 180, dtype=np.uint8)
@@ -136,6 +136,16 @@ class VisionTests(unittest.TestCase):
 
         self.assertEqual(roi.lower_half_quad.shape, (4, 2))
 
+    def test_overlay_hides_green_lower_half_box(self):
+        image = np.full((220, 260), 180, dtype=np.uint8)
+        image[20:200, 70:190] = 70
+
+        roi = locate_weld_roi(image, width=60, height=120, dark_threshold=100)
+        overlay = draw_roi(image, roi)
+
+        pure_green = np.all(overlay == np.array([0, 255, 0], dtype=np.uint8), axis=2)
+        self.assertEqual(int(np.count_nonzero(pure_green)), 0)
+
     def test_missing36_center_does_not_snap_to_bright_edge(self):
         image_path = ROOT / "data" / "raw" / "ng" / "missing (36).bmp"
         self.assertTrue(image_path.exists())
@@ -153,6 +163,24 @@ class VisionTests(unittest.TestCase):
         )
 
         self.assertLessEqual(abs(roi.center_x - roi.geometry_center_x), 15)
+
+    def test_roi_height_extends_downward_by_10_percent(self):
+        image = np.full((260, 280), 180, dtype=np.uint8)
+        cv2.ellipse(image, (120, 90), (85, 65), 0, 0, 360, 70, -1)
+        image[105:235, 100:180] = 70
+
+        roi = locate_weld_roi(
+            image,
+            width=70,
+            height=120,
+            dark_threshold=100,
+            bright_threshold=180,
+            bottom_margin=0,
+        )
+
+        self.assertEqual(roi.y, 115)
+        self.assertEqual(roi.height, 132)
+        self.assertEqual(roi.y + roi.height - 1, 246)
 
     def test_deskew_delta_uses_correct_opencv_rotation_sign(self):
         self.assertLess(_deskew_delta(((0, 0), (793, 1331), -22.37)), 0)
