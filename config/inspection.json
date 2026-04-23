@@ -1,0 +1,22 @@
+{
+  "roi": {
+    "width": 340,
+    "height": 950,
+    "dark_threshold": 100,
+    "bright_threshold": 180,
+    "search_left_ratio": 0.25,
+    "search_right_ratio": 0.75,
+    "search_top_ratio": 0.2,
+    "center_search_ratio": 0.16,
+    "score_height_ratio": 0.6,
+    "bottom_margin": 0
+  },
+  "threshold": {
+    "bright_value": 180
+  },
+  "rules": {
+    "missing_area_threshold": 5000,
+    "less_fill_threshold": 0.04,
+    "min_height_px": 740
+  }
+}

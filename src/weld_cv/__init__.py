@@ -1,0 +1,2 @@
+"""OpenCV terminal weld inspection."""
+

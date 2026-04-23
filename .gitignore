@@ -1,0 +1,8 @@
+.tmp/
+.tmp-tests/
+.venv/
+.venv-work/
+.vendor/
+.wheels/
+__pycache__/
+*.pyc
