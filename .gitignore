@@ -6,3 +6,9 @@
 .wheels/
 __pycache__/
 *.pyc
+data/
+results/
+datasets/
+runs/
+!datasets/README.md
+!runs/README.md

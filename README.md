@@ -2,6 +2,27 @@
 
 OpenCV version for terminal weld inspection.
 
+## Directory Layout
+
+```text
+recipes/
+  terminal_A/
+    recipe.json
+
+datasets/
+  terminal_A/
+    raw/
+
+runs/
+  terminal_A/
+    2026-04-24_拉长版/
+    2026-04-24_3张误杀版/
+```
+
+当前 `terminal_A` 参数已保存到：
+
+- `recipes/terminal_A/recipe.json`
+
 ## Run
 
 ```powershell
@@ -24,4 +45,3 @@ results/debug/review/    predicted NG or zero-area cases
 $env:PYTHONPATH='.vendor;src'
 python -m unittest discover -s tests
 ```
-
