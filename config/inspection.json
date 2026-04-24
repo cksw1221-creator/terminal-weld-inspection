@@ -16,7 +16,9 @@
   },
   "rules": {
     "missing_area_threshold": 5000,
-    "less_fill_threshold": 0.04,
-    "min_height_px": 740
+    "less_fill_threshold": 0.052,
+    "less_fill_component_threshold": 22,
+    "min_height_px": 690,
+    "min_height_coverage_threshold": 0.66
   }
 }

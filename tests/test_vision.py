@@ -190,7 +190,9 @@ class VisionTests(unittest.TestCase):
         rules = {
             "missing_area_threshold": 100,
             "less_fill_threshold": 0.05,
+            "less_fill_component_threshold": 22,
             "min_height_px": 60,
+            "min_height_coverage_threshold": 0.66,
         }
 
         missing = np.zeros((100, 50), dtype=np.uint8)
@@ -202,6 +204,44 @@ class VisionTests(unittest.TestCase):
         self.assertEqual(classify_features(extract_features(missing, 180), rules)[0], "missing")
         self.assertEqual(classify_features(extract_features(less, 180), rules)[0], "less")
         self.assertEqual(classify_features(extract_features(ok, 180), rules)[0], "ok")
+
+    def test_classify_rules_allow_ok_when_single_metric_is_low_but_structure_is_strong(self):
+        rules = {
+            "missing_area_threshold": 100,
+            "less_fill_threshold": 0.052,
+            "less_fill_component_threshold": 22,
+            "min_height_px": 690,
+            "min_height_coverage_threshold": 0.66,
+        }
+
+        high_component_ok = {
+            "weld_area": 8000,
+            "fill_ratio": 0.022,
+            "weld_width": 100,
+            "weld_height": 720,
+            "vertical_coverage": 0.72,
+            "component_count": 36,
+        }
+        high_coverage_ok = {
+            "weld_area": 22000,
+            "fill_ratio": 0.068,
+            "weld_width": 100,
+            "weld_height": 680,
+            "vertical_coverage": 0.70,
+            "component_count": 18,
+        }
+        real_less = {
+            "weld_area": 9000,
+            "fill_ratio": 0.020,
+            "weld_width": 90,
+            "weld_height": 680,
+            "vertical_coverage": 0.62,
+            "component_count": 15,
+        }
+
+        self.assertEqual(classify_features(high_component_ok, rules)[0], "ok")
+        self.assertEqual(classify_features(high_coverage_ok, rules)[0], "ok")
+        self.assertEqual(classify_features(real_less, rules)[0], "less")
 
 
 if __name__ == "__main__":

@@ -76,10 +76,16 @@ def extract_features(roi_gray: np.ndarray, threshold: int) -> dict[str, float]:
 def classify_features(features: dict[str, float], rules: dict[str, float]) -> tuple[str, str]:
     if features["weld_area"] < rules["missing_area_threshold"]:
         return "missing", "area_below_missing_threshold"
-    if features["fill_ratio"] < rules["less_fill_threshold"]:
-        return "less", "fill_ratio_below_less_threshold"
-    if features["weld_height"] < rules["min_height_px"]:
-        return "less", "height_below_min_height"
+    if (
+        features["fill_ratio"] < rules["less_fill_threshold"]
+        and features["component_count"] < rules["less_fill_component_threshold"]
+    ):
+        return "less", "fill_ratio_and_component_count_below_threshold"
+    if (
+        features["weld_height"] < rules["min_height_px"]
+        and features["vertical_coverage"] < rules["min_height_coverage_threshold"]
+    ):
+        return "less", "height_and_coverage_below_threshold"
     return "ok", "rules_passed"
 
 
